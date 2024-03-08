@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // Model User yang merepresentasikan tabel 'users'
 class User extends Model
@@ -18,4 +19,12 @@ class User extends Model
     public $timestamps = true;
     // Mengaktifkan incrementing untuk primary key
     public $incrementing = true;
+
+    // Relationship One-to-Many dengan model Contact
+    public function contacts(): HasMany
+    {
+        // Mengembalikan relasi HasMany dengan model Contact
+        // Kolom 'user_id' pada tabel 'contacts' akan merujuk ke kolom 'id' pada tabel 'users'
+        return $this->hasMany(Contact::class, "user_id", "id");
+    }
 }
