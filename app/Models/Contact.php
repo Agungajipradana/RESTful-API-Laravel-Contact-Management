@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 // Model Contact yang merepresentasikan tabel 'contacts'
 class Contact extends Model
@@ -26,5 +27,13 @@ class Contact extends Model
         // Mengembalikan relasi BelongsTo dengan model User
         // Kolom 'user_id' pada tabel 'contacts' akan merujuk ke kolom 'id' pada tabel 'users'
         return $this->belongsTo(Contact::class, "user_id", "id");
+    }
+
+    // Relationship One-to-Many dengan model Address
+    public function addresses(): HasMany
+    {
+        // Mengembalikan relasi HasMany dengan model Address
+        // Kolom 'contact_id' pada tabel 'addresses' akan merujuk ke kolom 'id' pada tabel 'contacts'
+        return $this->hasMany(Address::class, "contact_id", "id");
     }
 }
