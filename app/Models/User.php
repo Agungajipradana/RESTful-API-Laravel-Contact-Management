@@ -20,6 +20,13 @@ class User extends Model
     // Mengaktifkan incrementing untuk primary key
     public $incrementing = true;
 
+    // Kolom yang dapat diisi secara massal (mass assignable) atau bisa diubah
+    protected $fillable = [
+        "username",
+        "password",
+        "name"
+    ];
+
     // Relationship One-to-Many dengan model Contact
     public function contacts(): HasMany
     {
