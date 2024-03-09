@@ -190,4 +190,94 @@ class UserTest extends TestCase
                 ]
             ]);
     }
+
+    // Metode untuk menguji update data password user saat berhasil
+    public function testUpdatePasswordSuccess()
+    {
+        // Menambahkan user baru dengan username "test"
+        $this->seed([UserSeeder::class]);
+        // Mengambil data user sebelum diupdate
+        $oldUser = User::where("username", "test")->first();
+
+        // Mengirimkan request PATCH untuk mengupdate password user dengan Authorization token
+        $this->patch(
+            "api/users/current",
+            [
+                "password" => "baru"
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(200) // Memastikan respons memiliki status code 200 (OK)
+            // Memastikan respons berupa JSON dengan data yang sesuai
+            ->assertJson([
+                "data" => [
+                    "username" => "test",
+                    "name" => "test"
+                ]
+            ]);
+
+        // Mengambil data user setelah diupdate
+        $newUser = User::where("username", "test")->first();
+        // Memastikan password user telah diupdate
+        self::assertNotEquals($oldUser->password, $newUser->password);
+    }
+
+    // Metode untuk menguji update data name user saat berhasil
+    public function testUpdateNameSuccess()
+    {
+        // Menambahkan user baru dengan username "test"
+        $this->seed([UserSeeder::class]);
+        // Mengambil data user sebelum diupdate
+        $oldUser = User::where("username", "test")->first();
+
+        // Mengirimkan request PATCH untuk mengupdate name user dengan Authorization token
+        $this->patch(
+            "api/users/current",
+            [
+                "name" => "Jhon"
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(200) // Memastikan respons memiliki status code 200 (OK)
+            // Memastikan respons berupa JSON dengan data yang sesuai
+            ->assertJson([
+                "data" => [
+                    "username" => "test",
+                    "name" => "Jhon"
+                ]
+            ]);
+
+        // Mengambil data user setelah diupdate
+        $newUser = User::where("username", "test")->first();
+        // Memastikan name user telah diupdate
+        self::assertNotEquals($oldUser->name, $newUser->name);
+    }
+
+    // Metode untuk menguji update data user gagal
+    public function testUpdateFailed()
+    {
+        // Menambahkan user baru dengan username "test"
+        $this->seed([UserSeeder::class]);
+
+        // Mengirimkan request PATCH dengan name yang lebih dari 100 karakter dan Authorization token
+        $this->patch(
+            "api/users/current",
+            [
+                "name" => "JhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhonJhon"
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(400) // Memastikan respons memiliki status code 400 (Bad Request)
+            // Memastikan respons berupa JSON dengan pesan error yang sesuai
+            ->assertJson([
+                "errors" => [
+                    "name" => [
+                        "The name field must not be greater than 100 characters."
+                    ]
+                ]
+            ]);
+    }
 }

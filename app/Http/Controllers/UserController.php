@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -77,6 +78,28 @@ class UserController extends Controller
         // Mendapatkan user yang sedang login
         $user = Auth::user();
         // Mengembalikan response berupa data user
+        return new UserResource($user);
+    }
+
+    // Method untuk mengupdate data user yang sedang login
+    public function update(UserUpdateRequest $request): UserResource
+    {
+        $data = $request->validated();
+        $user = Auth::user();
+
+        // Memeriksa apakah ada data name yang akan diupdate
+        if (isset($data["name"])) {
+            $user->name = $data["name"];
+        }
+
+        // Memeriksa apakah ada data password yang akan diupdate
+        if (isset($data["password"])) {
+            $user->password = Hash::make($data["password"]);
+        }
+
+        // Menyimpan perubahan data user ke database
+        $user->save();
+        // Mengembalikan response berupa data user yang sudah diupdate
         return new UserResource($user);
     }
 }
