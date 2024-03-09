@@ -280,4 +280,44 @@ class UserTest extends TestCase
                 ]
             ]);
     }
+
+    // Metode untuk menguji logout user berhasil
+    public function testLogoutSuccess()
+    {
+        // Menambahkan user baru dengan username "test"
+        $this->seed([UserSeeder::class]);
+
+        // Mengirimkan request DELETE ke endpoint /api/users/logout dengan Authorization token 'test'
+        $this->delete(uri: "/api/users/logout", headers: [
+            "Authorization" => "test"
+        ])->assertStatus(200) // Memastikan respons memiliki status code 200 (OK)
+            // Memastikan respons berupa JSON dengan data true
+            ->assertJson([
+                "data" => true
+            ]);
+
+        // Memeriksa apakah token user telah dihapus setelah logout
+        $user = User::where("username", "test")->first();
+        self::assertNull($user->token);
+    }
+
+    // Metode untuk menguji logout user gagal karena token tidak valid
+    public function testLogoutFailed()
+    {
+        // Menambahkan user baru dengan username "test"
+        $this->seed([UserSeeder::class]);
+
+        // Mengirimkan request DELETE ke endpoint /api/users/logout dengan Authorization token 'salah'
+        $this->delete(uri: "/api/users/logout", headers: [
+            "Authorization" => "salah"
+        ])->assertStatus(401) // Memastikan respons memiliki status code 401 (Unauthorized)
+            // Memastikan respons berupa JSON dengan pesan error yang sesuai
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "unauthorized"
+                    ]
+                ]
+            ]);
+    }
 }

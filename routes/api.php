@@ -31,4 +31,6 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
     Route::get("/users/current", [App\Http\Controllers\UserController::class, "get"]);
     // Route untuk mengupdate data user yang sedang login
     Route::patch("/users/current", [App\Http\Controllers\UserController::class, "update"]);
+    // Route untuk logout user yang sedang login
+    Route::delete("/users/logout", [App\Http\Controllers\UserController::class, "logout"]);
 });

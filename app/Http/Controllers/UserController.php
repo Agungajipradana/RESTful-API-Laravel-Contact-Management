@@ -102,4 +102,19 @@ class UserController extends Controller
         // Mengembalikan response berupa data user yang sudah diupdate
         return new UserResource($user);
     }
+
+    // Method untuk logout user
+    public function logout(Request $request): JsonResponse
+    {
+        // Mendapatkan user yang sedang login
+        $user = Auth::user();
+        // Menghapus token user untuk logout
+        $user->token = null;
+        $user->save();
+
+        // Mengembalikan response berupa JSON dengan data true dan status code 200
+        return response()->json([
+            "data" => true
+        ])->setStatusCode(200);
+    }
 }
