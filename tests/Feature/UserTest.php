@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\User;
+use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -68,6 +70,67 @@ class UserTest extends TestCase
                 "errors" => [
                     "username" => [
                         "username already registered"
+                    ]
+                ]
+            ]);
+    }
+
+    // Metode untuk menguji login user berhasil
+    public function testLoginSuccess()
+    {
+        // Menjalankan seeder UserSeeder untuk menambahkan data user baru ke database
+        $this->seed([UserSeeder::class]);
+        // Mengirimkan permintaan POST ke endpoint /api/users/login dengan data login user yang benar
+        $this->post("/api/users/login", [
+            "username" => "test",
+            "password" => "test"
+        ])->assertStatus(200) // Memastikan respons memiliki status code 200 (OK)
+            // Memastikan respons berupa JSON dengan data user yang sesuai
+            ->assertJson([
+                "data" => [
+                    "username" => "test",
+                    "name" => "test"
+                ]
+            ]);
+
+        // Memeriksa apakah user memiliki token yang tidak null setelah login
+        $user = User::where("username", "test")->first();
+        self::assertNotNull($user->token);
+    }
+
+    // Metode untuk menguji login user gagal karena username tidak ditemukan
+    public function testLoginFailedUsernameNotFound()
+    {
+        // Mengirimkan permintaan POST ke endpoint /api/users/login dengan username yang tidak terdaftar
+        $this->post("/api/users/login", [
+            "username" => "test",
+            "password" => "test"
+        ])->assertStatus(401) // Memastikan respons memiliki status code 401 (Unauthorized)
+            // Memastikan respons berupa JSON dengan pesan error yang sesuai
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "username or password wrong"
+                    ]
+                ]
+            ]);
+    }
+
+    // Metode untuk menguji login user gagal karena password salah
+    public function testLoginFailedPasswordWrong()
+    {
+        // Menjalankan seeder UserSeeder untuk menambahkan data user baru ke database
+        $this->seed([UserSeeder::class]);
+        // Mengirimkan permintaan POST ke endpoint /api/users/login dengan password yang salah
+        $this->post("/api/users/login", [
+            "username" => "test",
+            "password" => "salah"
+        ])->assertStatus(401) // Memastikan respons memiliki status code 401 (Unauthorized)
+            // Memastikan respons berupa JSON dengan pesan error yang sesuai
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "username or password wrong"
                     ]
                 ]
             ]);

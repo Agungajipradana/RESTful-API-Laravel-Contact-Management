@@ -21,3 +21,6 @@ use Illuminate\Support\Facades\Route;
 
 // Route untuk registrasi user baru
 Route::post("/users", [App\Http\Controllers\UserController::class, "register"]);
+
+// Route untuk login user
+Route::post("/users/login", [App\Http\Controllers\UserController::class, "login"]);

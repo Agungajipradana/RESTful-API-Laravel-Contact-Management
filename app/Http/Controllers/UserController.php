@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -9,6 +10,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -38,5 +40,33 @@ class UserController extends Controller
 
         // Mengembalikan response berupa data user yang baru saja dibuat dengan status code 201 (Created)
         return(new UserResource($user))->response()->setStatusCode(201);
+    }
+
+    // Method untuk melakukan login user
+    public function login(UserLoginRequest $requuest): UserResource
+    {
+        // Memvalidasi inputan dengan aturan yang telah ditentukan
+        $data = $requuest->validated();
+
+        // Mencari user berdasarkan username
+        $user = User::where("username", $data["username"])->first();
+
+        // Memeriksa apakah user ditemukan dan password cocok
+        if (!$user || !Hash::check($data["password"], $user->password)) {
+            throw new HttpResponseException(response([
+                "errors" => [
+                    "message" => [
+                        "username or password wrong"
+                    ]
+                ]
+            ], 401));
+        }
+
+        // Membuat token baru untuk user dan menyimpannya ke database
+        $user->token = Str::uuid()->toString();
+        $user->save();
+
+        // Mengembalikan response berupa data user dengan token baru
+        return new UserResource($user);
     }
 }
