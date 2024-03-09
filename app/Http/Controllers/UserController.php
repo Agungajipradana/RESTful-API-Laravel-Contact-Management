@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -67,6 +68,15 @@ class UserController extends Controller
         $user->save();
 
         // Mengembalikan response berupa data user dengan token baru
+        return new UserResource($user);
+    }
+
+    // Method untuk mendapatkan data user yang sedang login
+    public function get(Request $request): UserResource
+    {
+        // Mendapatkan user yang sedang login
+        $user = Auth::user();
+        // Mengembalikan response berupa data user
         return new UserResource($user);
     }
 }

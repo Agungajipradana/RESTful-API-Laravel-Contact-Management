@@ -135,4 +135,59 @@ class UserTest extends TestCase
                 ]
             ]);
     }
+
+    // Metode untuk menguji mendapatkan data user saat berhasil
+    public function testGetSuccess()
+    {
+        $this->seed([UserSeeder::class]);
+
+        // Mengirimkan permintaan GET ke endpoint /api/users/current dengan token 'test'
+        $this->get("api/users/current", [
+            "Authorization" => "test"
+        ])->assertStatus(200) // Memastikan respons memiliki status code 200 (OK)
+            // Memastikan respons berupa JSON dengan data user yang sesuai
+            ->assertJson([
+                "data" => [
+                    "username" => "test",
+                    "name" => "test"
+                ]
+            ]);
+    }
+
+    // Metode untuk menguji mendapatkan data user saat tidak terautentikasi
+    public function testGetUnauthorized()
+    {
+        $this->seed([UserSeeder::class]);
+
+        // Mengirimkan permintaan GET ke endpoint /api/users/current tanpa token
+        $this->get("api/users/current")
+            ->assertStatus(401) // Memastikan respons memiliki status code 401 (Unauthorized)
+            // Memastikan respons berupa JSON dengan pesan error yang sesuai
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "unauthorized"
+                    ]
+                ]
+            ]);
+    }
+
+    // Metode untuk menguji mendapatkan data user saat token tidak valid
+    public function testGetInvalidToken()
+    {
+        $this->seed([UserSeeder::class]);
+
+        // Mengirimkan permintaan GET ke endpoint /api/users/current dengan token 'salah'
+        $this->get("api/users/current", [
+            "Authorization" => "salah"
+        ])->assertStatus(401) // Memastikan respons memiliki status code 401 (Unauthorized)
+            // Memastikan respons berupa JSON dengan pesan error yang sesuai
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "unauthorized"
+                    ]
+                ]
+            ]);
+    }
 }

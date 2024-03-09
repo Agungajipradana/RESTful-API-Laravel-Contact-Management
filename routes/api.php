@@ -24,3 +24,9 @@ Route::post("/users", [App\Http\Controllers\UserController::class, "register"]);
 
 // Route untuk login user
 Route::post("/users/login", [App\Http\Controllers\UserController::class, "login"]);
+
+// Grouping route dengan middleware ApiAuthMiddleware untuk memastikan user telah login
+Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function () {
+    // Route untuk mendapatkan data user yang sedang login
+    Route::get("/users/current", [App\Http\Controllers\UserController::class, "get"]);
+});
