@@ -33,4 +33,7 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
     Route::patch("/users/current", [App\Http\Controllers\UserController::class, "update"]);
     // Route untuk logout user yang sedang login
     Route::delete("/users/logout", [App\Http\Controllers\UserController::class, "logout"]);
+
+    // Route untuk membuat kontak baru
+    Route::post("/contacts", [App\Http\Controllers\ContactController::class, "create"]);
 });

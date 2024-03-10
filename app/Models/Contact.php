@@ -21,6 +21,14 @@ class Contact extends Model
     // Mengaktifkan timestamps (created_at dan updated_at)
     public $timestamps = true;
 
+    // Kolom yang dapat diisi secara massal (mass assignable) atau bisa diubah
+    protected $fillable = [
+        "first_name",
+        "last_name",
+        "email",
+        "phone"
+    ];
+
     // Relationship Many-to-One dengan model User
     public function user(): BelongsTo
     {
