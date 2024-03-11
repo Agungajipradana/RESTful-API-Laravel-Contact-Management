@@ -86,4 +86,30 @@ class ContactController extends Controller
         // Kembalikan response JSON dengan data kontak yang telah diupdate
         return new ContactResource($contact);
     }
+
+    // Method untuk menghapus kontak berdasarkan ID
+    public function delete(int $id): JsonResponse
+    {
+        $user = Auth::user();
+
+        // Cari kontak berdasarkan ID dan user_id
+        $contact = Contact::where("id", $id)->where("user_id", $user->id)->first();
+
+        // Jika kontak tidak ditemukan, kirim response JSON dengan status code 404 (not found)
+        if (!$contact) {
+            throw new HttpResponseException(response()->json([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+
+        // Hapus kontak
+        $contact->delete();
+        return response()->json([
+            "data" => true
+        ])->setStatusCode(200);
+    }
 }

@@ -197,4 +197,44 @@ class ContactTest extends TestCase
                 ]
             ]);
     }
+
+    // Test untuk menghapus kontak dengan sukses
+    public function testDeleteSuccess()
+    {
+        // Menjalankan seeder untuk menambahkan user dummy dan kontak dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+
+        // Mengambil salah satu kontak
+        $contact = Contact::query()->limit(1)->first();
+
+        // Mengirimkan request DELETE untuk menghapus kontak
+        $this->delete("/api/contacts/" . $contact->id, [], [
+            "Authorization" => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => true
+            ]);
+    }
+
+    // Test untuk menghapus kontak yang tidak ditemukan
+    public function testDeleteNotFound()
+    {
+        // Menjalankan seeder untuk menambahkan user dummy dan kontak dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+
+        // Mengambil salah satu kontak
+        $contact = Contact::query()->limit(1)->first();
+
+        // Mengirimkan request DELETE untuk menghapus kontak yang tidak ada
+        $this->delete("/api/contacts/" . ($contact->id + 1), [], [
+            "Authorization" => "test"
+        ])->assertStatus(404)
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ]);
+    }
 }
