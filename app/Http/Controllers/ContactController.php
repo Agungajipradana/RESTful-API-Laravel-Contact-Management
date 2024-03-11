@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactCreateRequest;
+use App\Http\Requests\ContactUpdateRequest;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -10,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
+// Controller untuk operasi CRUD pada kontak
 class ContactController extends Controller
 {
     // Method untuk membuat kontak baru
@@ -52,6 +54,36 @@ class ContactController extends Controller
         }
 
         // Jika kontak ditemukan, kembalikan response JSON dengan data kontak
+        return new ContactResource($contact);
+    }
+
+    // Method untuk mengupdate kontak berdasarkan ID
+    public function update(int $id, ContactUpdateRequest $request): ContactResource
+    {
+        // Ambil user yang sedang terautentikasi
+        $user = Auth::user();
+
+        // Cari kontak berdasarkan ID dan user_id
+        $contact = Contact::where("id", $id)->where("user_id", $user->id)->first();
+
+        // Jika kontak tidak ditemukan, kirim response JSON dengan status code 404 (not found)
+        if (!$contact) {
+            throw new HttpResponseException(response()->json([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ])->setStatusCode(404));
+        }
+
+        // Validasi data dari request
+        $data = $request->validated();
+        // Update data kontak
+        $contact->fill($data);
+        $contact->save();
+
+        // Kembalikan response JSON dengan data kontak yang telah diupdate
         return new ContactResource($contact);
     }
 }

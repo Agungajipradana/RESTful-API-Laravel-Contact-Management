@@ -142,4 +142,59 @@ class ContactTest extends TestCase
                 ]
             ]);
     }
+
+    // Test untuk mengecek berhasil mengupdate kontak
+    public function testUpdateSuccess()
+    {
+        // Menjalankan seeder untuk menambahkan user dan kontak dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+
+        // Mengambil satu data kontak dari database
+        $contact = Contact::query()->limit(1)->first();
+
+        // Melakukan request PUT untuk mengupdate kontak dengan data baru
+        $this->put("/api/contacts/" . $contact->id, [
+            "first_name" => "test2",
+            "last_name" => "test2",
+            "email" => "test2@gmail.com",
+            "phone" => "1111112",
+        ], [
+            "Authorization" => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    "first_name" => "test2",
+                    "last_name" => "test2",
+                    "email" => "test2@gmail.com",
+                    "phone" => "1111112",
+                ]
+            ]);
+    }
+
+    // Test untuk mengecek gagal mengupdate kontak karena validasi error
+    public function testUpdateValidationError()
+    {
+        // Menjalankan seeder untuk menambahkan user dan kontak dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+
+        // Mengambil satu data kontak dari database
+        $contact = Contact::query()->limit(1)->first();
+
+        // Melakukan request PUT untuk mengupdate kontak dengan data tidak valid
+        $this->put("/api/contacts/" . $contact->id, [
+            "first_name" => "",
+            "last_name" => "test2",
+            "email" => "test2@gmail.com",
+            "phone" => "1111112",
+        ], [
+            "Authorization" => "test"
+        ])->assertStatus(400)
+            ->assertJson([
+                "errors" => [
+                    "first_name" => [
+                        "The first name field is required."
+                    ]
+                ]
+            ]);
+    }
 }
