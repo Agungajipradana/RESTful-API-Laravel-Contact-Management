@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Models\Contact;
+use Database\Seeders\ContactSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -81,6 +83,61 @@ class ContactTest extends TestCase
                 "errors" => [
                     "message" => [
                         "unauthorized"
+                    ]
+                ]
+            ]);
+    }
+
+    // Test untuk mengecek berhasil mendapatkan kontak
+    public function testGetSuccess()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+        $contact = Contact::query()->limit(1)->first();
+
+        $this->get("/api/contacts/" . $contact->id, [
+            "Authorization" => "test"
+        ])->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    "first_name" => "test",
+                    "last_name" => "test",
+                    "email" => "test@gmail.com",
+                    "phone" => "111111",
+                ]
+            ]);
+    }
+
+    // Test untuk mengecek gagal mendapatkan kontak karena tidak ditemukan
+    public function testGetNotFound()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+        $contact = Contact::query()->limit(1)->first();
+
+        $this->get("/api/contacts/" . ($contact->id + 1), [
+            "Authorization" => "test"
+        ])->assertStatus(404)
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ]);
+    }
+
+    // Test untuk mengecek gagal mendapatkan kontak karena bukan milik user tersebut
+    public function testGetOtherUserContact()
+    {
+        $this->seed([UserSeeder::class, ContactSeeder::class]);
+        $contact = Contact::query()->limit(1)->first();
+
+        $this->get("/api/contacts/" . $contact->id, [
+            "Authorization" => "test2"
+        ])->assertStatus(404)
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "not found"
                     ]
                 ]
             ]);

@@ -22,5 +22,13 @@ class UserSeeder extends Seeder
             "name" => "test",
             "token" => "test"
         ]);
+
+        // Membuat user baru dengan username, password, dan name 'test2'
+        User::create([
+            "username" => "test2",
+            "password" => Hash::make("test2"),
+            "name" => "test2",
+            "token" => "test2"
+        ]);
     }
 }
