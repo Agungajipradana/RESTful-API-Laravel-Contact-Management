@@ -36,6 +36,8 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
 
     // Route untuk membuat kontak baru
     Route::post("/contacts", [App\Http\Controllers\ContactController::class, "create"]);
+    // Route untuk mencari kontak berdasarkan nama, email, atau nomor telepon
+    Route::get("/contacts", [App\Http\Controllers\ContactController::class, "search"]);
     // Route untuk mendapatkan kontak berdasarkan ID
     Route::get("/contacts/{id}", [App\Http\Controllers\ContactController::class, "get"])->where("id", "[0-9]+");
     // Route untuk mengupdate kontak berdasarkan ID

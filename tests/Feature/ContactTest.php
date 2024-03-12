@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Contact;
 use Database\Seeders\ContactSeeder;
+use Database\Seeders\SearchSeeder;
 use Database\Seeders\UserSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 class ContactTest extends TestCase
@@ -236,5 +238,139 @@ class ContactTest extends TestCase
                     ]
                 ]
             ]);
+    }
+
+    // Test untuk mencari kontak berdasarkan nama depan
+    public function testSearchByFirstName()
+    {
+        // Menjalankan seeder untuk menambahkan data dummy
+        $this->seed([UserSeeder::class, SearchSeeder::class]);
+
+        // Melakukan request GET untuk mencari kontak berdasarkan nama depan
+        $response = $this->get("/api/contacts?name=first", [
+            "Authorization" => "test"
+        ])
+            ->assertStatus(200) // Memastikan response status code 200 (OK)
+            ->json(); // Mengubah response menjadi array JSON
+
+        // Mencetak response dengan format JSON yang mudah dibaca
+        Log::info(json_encode($response, JSON_PRETTY_PRINT));
+
+        // Memastikan jumlah data yang dikembalikan sesuai dengan yang diharapkan
+        self::assertEquals(10, count($response["data"]));
+        // Memastikan total data yang ada sesuai dengan yang diharapkan
+        self::assertEquals(20, $response["meta"]["total"]);
+    }
+
+    // Test untuk mencari kontak berdasarkan nama belakang
+    public function testSearchByLastName()
+    {
+        // Menjalankan seeder untuk menambahkan data dummy
+        $this->seed([UserSeeder::class, SearchSeeder::class]);
+
+        // Melakukan request GET untuk mencari kontak berdasarkan nama belakang
+        $response = $this->get("/api/contacts?name=last", [
+            "Authorization" => "test"
+        ])
+            ->assertStatus(200) // Memastikan response status code 200 (OK)
+            ->json(); // Mengubah response menjadi array JSON
+
+        // Mencetak response dengan format JSON yang mudah dibaca
+        Log::info(json_encode($response, JSON_PRETTY_PRINT));
+
+        // Memastikan jumlah data yang dikembalikan sesuai dengan yang diharapkan
+        self::assertEquals(10, count($response["data"]));
+        // Memastikan total data yang ada sesuai dengan yang diharapkan
+        self::assertEquals(20, $response["meta"]["total"]);
+    }
+
+    // Test untuk mencari kontak berdasarkan email
+    public function testSearchByEmail()
+    {
+        // Menjalankan seeder untuk menambahkan data dummy
+        $this->seed([UserSeeder::class, SearchSeeder::class]);
+
+        // Melakukan request GET untuk mencari kontak berdasarkan email
+        $response = $this->get("/api/contacts?email=test", [
+            "Authorization" => "test"
+        ])
+            ->assertStatus(200) // Memastikan response status code 200 (OK)
+            ->json(); // Mengubah response menjadi array JSON
+
+        // Mencetak response dengan format JSON yang mudah dibaca
+        Log::info(json_encode($response, JSON_PRETTY_PRINT));
+
+        // Memastikan jumlah data yang dikembalikan sesuai dengan yang diharapkan
+        self::assertEquals(10, count($response["data"]));
+        // Memastikan total data yang ada sesuai dengan yang diharapkan
+        self::assertEquals(20, $response["meta"]["total"]);
+    }
+
+    // Test untuk mencari kontak berdasarkan nomor telepon
+    public function testSearchByPhone()
+    {
+        // Menjalankan seeder untuk menambahkan data dummy
+        $this->seed([UserSeeder::class, SearchSeeder::class]);
+
+        // Melakukan request GET untuk mencari kontak berdasarkan nomor telepon
+        $response = $this->get("/api/contacts?phone=11111", [
+            "Authorization" => "test"
+        ])
+            ->assertStatus(200) // Memastikan response status code 200 (OK)
+            ->json(); // Mengubah response menjadi array JSON
+
+        // Mencetak response dengan format JSON yang mudah dibaca
+        Log::info(json_encode($response, JSON_PRETTY_PRINT));
+
+        // Memastikan jumlah data yang dikembalikan sesuai dengan yang diharapkan
+        self::assertEquals(10, count($response["data"]));
+        // Memastikan total data yang ada sesuai dengan yang diharapkan
+        self::assertEquals(20, $response["meta"]["total"]);
+    }
+
+    // Test untuk mencari kontak yang tidak ditemukan
+    public function testSearchNotFound()
+    {
+        // Menjalankan seeder untuk menambahkan data dummy
+        $this->seed([UserSeeder::class, SearchSeeder::class]);
+
+        // Melakukan request GET untuk mencari kontak yang tidak ada
+        $response = $this->get("/api/contacts?name=tidakada", [
+            "Authorization" => "test"
+        ])
+            ->assertStatus(200) // Memastikan response status code 200 (OK)
+            ->json(); // Mengubah response menjadi array JSON
+
+        // Mencetak response dengan format JSON yang mudah dibaca
+        Log::info(json_encode($response, JSON_PRETTY_PRINT));
+
+        // Memastikan tidak ada data yang dikembalikan
+        self::assertEquals(0, count($response["data"]));
+        // Memastikan total data yang ada sesuai dengan yang diharapkan
+        self::assertEquals(0, $response["meta"]["total"]);
+    }
+
+    // Test untuk mencari kontak dengan pagination
+    public function testSearchWithPage()
+    {
+        // Menjalankan seeder untuk menambahkan data dummy
+        $this->seed([UserSeeder::class, SearchSeeder::class]);
+
+        // Melakukan request GET untuk mencari kontak dengan pagination
+        $response = $this->get("/api/contacts?size=5&page=2", [
+            "Authorization" => "test"
+        ])
+            ->assertStatus(200) // Memastikan response status code 200 (OK)
+            ->json(); // Mengubah response menjadi array JSON
+
+        // Mencetak response dengan format JSON yang mudah dibaca
+        Log::info(json_encode($response, JSON_PRETTY_PRINT));
+
+        // Memastikan jumlah data yang dikembalikan sesuai dengan yang diharapkan
+        self::assertEquals(5, count($response["data"]));
+        // Memastikan total data yang ada sesuai dengan yang diharapkan
+        self::assertEquals(20, $response["meta"]["total"]);
+        // Memastikan halaman saat ini sesuai dengan yang diharapkan
+        self::assertEquals(2, $response["meta"]["current_page"]);
     }
 }

@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ContactCreateRequest;
 use App\Http\Requests\ContactUpdateRequest;
+use App\Http\Resources\ContactCollection;
 use App\Http\Resources\ContactResource;
 use App\Models\Contact;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -111,5 +113,46 @@ class ContactController extends Controller
         return response()->json([
             "data" => true
         ])->setStatusCode(200);
+    }
+
+    // Method untuk mencari kontak berdasarkan nama, email, atau nomor telepon
+    public function search(Request $request): ContactCollection
+    {
+        // Ambil user yang sedang terautentikasi
+        $user = Auth::user();
+
+        // Ambil halaman dan ukuran halaman dari request
+        $page = $request->input("page", 1);
+        $size = $request->input("size", 10);
+
+        // Query untuk mencari kontak berdasarkan user_id
+        $contacts = Contact::query()->where("user_id", $user->id);
+
+        // Filter kontak berdasarkan nama, email, atau nomor telepon jika ada
+        $contacts = $contacts->where(function (Builder $builder) use ($request) {
+            $name = $request->input("name");
+            if ($name) {
+                $builder->where(function (Builder $builder) use ($name) {
+                    $builder->orWhere("first_name", "like", "%" . $name . "%");
+                    $builder->orWhere("last_name", "like", "%" . $name . "%");
+                });
+            }
+
+            $email = $request->input("email");
+            if ($email) {
+                $builder->where("email", "like", "%" . $email . "%");
+            }
+
+            $phone = $request->input("phone");
+            if ($phone) {
+                $builder->where("phone", "like", "%" . $phone . "%");
+            }
+        });
+
+        // Pagination
+        $contacts = $contacts->paginate(perPage: $size, page: $page);
+
+        // Mengembalikan hasil pencarian dalam bentuk collection
+        return new ContactCollection($contacts);
     }
 }
