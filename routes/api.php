@@ -44,4 +44,7 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
     Route::put("/contacts/{id}", [App\Http\Controllers\ContactController::class, "update"])->where("id", "[0-9]+");
     // Route untuk menghapus kontak berdasarkan ID
     Route::delete("/contacts/{id}", [App\Http\Controllers\ContactController::class, "delete"])->where("id", "[0-9]+");
+
+    // Route untuk membuat alamat baru untuk kontak tertentu
+    Route::post("/contacts/{idContact}/addresses", [App\Http\Controllers\AddressController::class, "create"])->where("id", "[0-9]+");
 });

@@ -19,6 +19,15 @@ class Address extends Model
     // Mengaktifkan timestamps (created_at dan updated_at)
     public $timestamps = true;
 
+    // Kolom yang dapat diisi secara massal (mass assignable) atau bisa diubah
+    protected $fillable = [
+        "street",
+        "city",
+        "provience",
+        "country",
+        "postal_code"
+    ];
+
     // Relationship Many-to-One dengan model Contact
     public function contact(): BelongsTo
     {
