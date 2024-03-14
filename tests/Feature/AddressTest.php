@@ -142,4 +142,96 @@ class AddressTest extends TestCase
                 ]
             ]);
     }
+
+    // Tes untuk memperbarui alamat dengan berhasil
+    public function testUpdateSuccess()
+    {
+        // Menyebarkan data dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        // Melakukan request PUT untuk memperbarui alamat
+        $this->put(
+            "/api/contacts/" . $address->contact_id . "/addresses/" . $address->id,
+            [
+                "street" => "update",
+                "city" => "update",
+                "provience" => "update",
+                "country" => "update",
+                "postal_code" => "22222"
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(200)
+            ->assertJson([
+                "data" => [
+                    "street" => "update",
+                    "city" => "update",
+                    "provience" => "update",
+                    "country" => "update",
+                    "postal_code" => "22222"
+                ]
+            ]);
+    }
+
+    // Tes untuk memperbarui alamat dengan kegagalan (field country tidak diisi)
+    public function testUpdateFailed()
+    {
+        // Menyebarkan data dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        // Melakukan request PUT untuk memperbarui alamat
+        $this->put(
+            "/api/contacts/" . $address->contact_id . "/addresses/" . $address->id,
+            [
+                "street" => "update",
+                "city" => "update",
+                "provience" => "update",
+                "country" => "",
+                "postal_code" => "22222"
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(400)
+            ->assertJson([
+                "errors" => [
+                    "country" => [
+                        "The country field is required."
+                    ]
+                ]
+            ]);
+    }
+
+    // Tes untuk memperbarui alamat yang tidak ditemukan
+    public function testUpdateNotFound()
+    {
+        // Menyebarkan data dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        // Melakukan request PUT untuk memperbarui alamat
+        $this->put(
+            "/api/contacts/" . $address->contact_id . "/addresses/" . ($address->id + 1),
+            [
+                "street" => "update",
+                "city" => "update",
+                "provience" => "update",
+                "country" => "update",
+                "postal_code" => "22222"
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(404)
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ]);
+    }
 }
