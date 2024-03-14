@@ -234,4 +234,50 @@ class AddressTest extends TestCase
                 ]
             ]);
     }
+
+    // Tes untuk menghapus alamat dengan berhasil
+    public function testDeleteSuccess()
+    {
+        // Menyebarkan data dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        // Melakukan request DELETE untuk menghapus alamat
+        $this->delete(
+            "/api/contacts/" . $address->contact_id . "/addresses/" . $address->id,
+            [
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(200)
+            ->assertJson([
+                "data" => true
+            ]);
+    }
+
+    // Tes untuk menghapus alamat yang tidak ditemukan
+    public function testDeleteNotFound()
+    {
+        // Menyebarkan data dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $address = Address::query()->limit(1)->first();
+
+        // Melakukan request DELETE untuk menghapus alamat yang tidak ditemukan
+        $this->delete(
+            "/api/contacts/" . $address->contact_id . "/addresses/" . ($address->id + 1),
+            [
+            ],
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(404)
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ]);
+    }
 }

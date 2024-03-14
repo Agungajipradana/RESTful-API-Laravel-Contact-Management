@@ -103,4 +103,24 @@ class AddressController extends Controller
         // Mengembalikan response JSON dengan data alamat yang telah diupdate
         return new AddressResource($address);
     }
+
+    // Method untuk menghapus alamat berdasarkan ID kontak dan ID alamat
+    public function delete(int $idContact, int $idAddress): JsonResponse
+    {
+
+        // Mendapatkan informasi user yang sedang login
+        $user = Auth::user();
+        // Mendapatkan informasi user yang sedang login
+        $contact = $this->getContact($user, $idContact);
+        // Mendapatkan alamat berdasarkan ID kontak dan ID alamat
+        $address = $this->getAddress($contact, $idAddress);
+
+        // Menghapus alamat dari database
+        $address->delete();
+
+        // Mengembalikan response JSON dengan status code 200
+        return response()->json([
+            "data" => true
+        ])->setStatusCode(200);
+    }
 }

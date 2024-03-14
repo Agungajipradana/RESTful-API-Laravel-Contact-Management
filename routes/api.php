@@ -56,4 +56,8 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
     Route::put("/contacts/{idContact}/addresses/{idAddress}", [App\Http\Controllers\AddressController::class, "update"])
         ->where("idContact", "[0-9]+")
         ->where("idAddress", "[0-9]+");
+    // Route untuk menghapus alamat berdasarkan ID kontak dan ID alamat
+    Route::delete("/contacts/{idContact}/addresses/{idAddress}", [App\Http\Controllers\AddressController::class, "delete"])
+        ->where("idContact", "[0-9]+")
+        ->where("idAddress", "[0-9]+");
 });
