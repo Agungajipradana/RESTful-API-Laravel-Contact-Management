@@ -123,4 +123,18 @@ class AddressController extends Controller
             "data" => true
         ])->setStatusCode(200);
     }
+
+    // Method untuk mendapatkan daftar alamat berdasarkan ID kontak
+    public function list(int $idContact): JsonResponse
+    {
+        // Mendapatkan informasi user yang sedang login
+        $user = Auth::user();
+        // Mendapatkan informasi kontak berdasarkan ID
+        $contact = $this->getContact($user, $idContact);
+        // Mendapatkan daftar alamat berdasarkan ID kontak
+        $addresses = Address::where("contact_id", $contact->id)->get();
+
+        // Mengembalikan response JSON berisi daftar alamat
+        return(AddressResource::collection($addresses))->response()->setStatusCode(200);
+    }
 }

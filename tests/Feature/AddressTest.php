@@ -280,4 +280,56 @@ class AddressTest extends TestCase
                 ]
             ]);
     }
+
+    // Tes untuk mendapatkan list alamat dengan berhasil
+    public function testListSuccess()
+    {
+        // Menyebarkan data dummy
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contact = Contact::query()->limit(1)->first();
+
+        // Melakukan request GET untuk mendapatkan daftar alamat
+        $this->get(
+            "/api/contacts/" . $contact->id . "/addresses",
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(200) // Memastikan respons memiliki status 200 (OK)
+            // Memastikan respons berupa JSON dengan struktur yang diharapkan
+            ->assertJson([
+                "data" => [
+                    [
+                        "street" => "test",
+                        "city" => "test",
+                        "provience" => "test",
+                        "country" => "test",
+                        "postal_code" => "11111"
+                    ]
+                ]
+            ]);
+    }
+
+    // Tes untuk mendapatkan list alamat yang tidak ditemukan
+    public function testListContactNotFound()
+    {
+        // Menyiapkan data dummy untuk pengujian
+        $this->seed([UserSeeder::class, ContactSeeder::class, AddressSeeder::class]);
+        $contact = Contact::query()->limit(1)->first();
+
+        // Melakukan request GET untuk mendapatkan daftar alamat dari kontak yang tidak ada
+        $this->get(
+            "/api/contacts/" . ($contact->id + 1) . "/addresses",
+            [
+                "Authorization" => "test"
+            ]
+        )->assertStatus(404) // Memastikan respons memiliki status 404 (Not Found)
+            // Memastikan respons berupa JSON dengan struktur yang diharapkan
+            ->assertJson([
+                "errors" => [
+                    "message" => [
+                        "not found"
+                    ]
+                ]
+            ]);
+    }
 }
